@@ -2,38 +2,59 @@ import React, { useState } from 'react'
 import { useNavigate, NavLink } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import { Button, Col, Row } from 'react-bootstrap';
+import { useFormik } from 'formik';
+import { RegisterValidation } from '../../components/RegisterValidation';
+
 import './Register.css';
+
+const formData = {
+  userName: '',
+  userEmail: '',
+  userFirstName: '',
+  userLastName: '',
+  userPassword: '',
+  confirmPassword: '',
+
+  addressLine: '',
+  street: '',
+  city: '',
+  state: '',
+  pincode: ''
+};
 
 const Register = () => {
 
-  const [formData, setFormData] = useState({
-    userName: '',
-    userEmail: '',
-    userFirstName: '',
-    userLastName: '',
-    userPassword: '',
-    confirmPassword: '',
-
-    addressLine: '',
-    street: '',
-    city: '',
-    state: '',
-    pincode: ''
-  });
   const navigate = useNavigate();
 
-  const handleChange = (e, field) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  const handleSubmit = () => {
+const {values, errors, touched, handleBlur, handleChange, handleSubmit} =  useFormik({
+    initialValues: formData,
+    validationSchema: RegisterValidation,
+    onSubmit: (values, action) => {
+      console.log(
+        "🚀 ~ file: Registration.jsx ~ line 11 ~ Registration ~ values",
+        values
+      );
+        action.resetForm();
+        navigate('/landingPage');
+      
+    },
+    
+  });
+
+ 
+
+  // const handleChange1 = (e, field) => {
+  //   const { name, value } = e.target;
+  //   setFormData({
+  //     ...formData,
+  //     [name]: value
+  //   });
+  // };
+  const handleSubmit1 = () => {
     alert('submitted registration form');
   }
 
-  const handleLogin = () => {
+  const handleLogin1 = () => {
     navigate('/login');
   }
 
@@ -43,22 +64,26 @@ const Register = () => {
         <div className='mini-logo' >
           <img src={require('../../assets/mini-shopper-logo.png')} alt='logo' className='img-logo' />
         </div>
-        <form onSubmit={handleSubmit} className='form-container'>
-          <Row>
+        <form onSubmit={handleSubmit} className='register-form-container'>
+          <Row className='row-container'>
             <Col>
               <div className='form-group'>
                 <label htmlFor='userName'>Username</label>
-                <div className='textbox'>
-                <input type='text' id='userName' name='userName' value={formData.userName} 
-                  placeholder='Enter your username' onChange={e => handleChange(e, 'userName')} />
-                  </div>
+                  <input type='text' id='userName' name='userName' value={values.userName}
+                    placeholder='Enter your username' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.userName && touched.userName ? (
+                    <p className='form-error'>{errors.userName}</p>
+                  ) : null }
               </div>
             </Col>
             <Col>
               <div className='form-group'>
                 <label htmlFor='userEmail'>Email</label>
-                <input type='text' id='userEmail' name='userEmail' value={formData.userEmail}
-                  placeholder='Enter your email' onChange={e => handleChange(e, 'userEmail')} />
+                <input type='text' id='userEmail' name='userEmail' value={values.userEmail}
+                  placeholder='Enter your email' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.userEmail && touched.userEmail ? (
+                    <p className='form-error'>{errors.userEmail}</p>
+                  ) : null }
               </div>
             </Col>
           </Row>
@@ -66,15 +91,21 @@ const Register = () => {
             <Col>
               <div className='form-group'>
                 <label htmlFor='userFirstName'>FirstName</label>
-                <input type='text' id='userFirstName' name='userFirstName' value={formData.userFirstName}
-                  placeholder='Enter your firstname' onChange={e => handleChange(e, 'userFirstName')} />
+                <input type='text' id='userFirstName' name='userFirstName' value={values.userFirstName}
+                  placeholder='Enter your firstname' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.userFirstName && touched.userFirstName ? (
+                    <p className='form-error'>{errors.userFirstName}</p>
+                  ) : null }
               </div>
             </Col>
             <Col>
               <div className='form-group'>
                 <label htmlFor='userLastName'>LastName</label>
-                <input type='text' id='userLastName' name='userLastName' value={formData.userLastName}
-                  placeholder='Enter your lastname' onChange={e => handleChange(e, 'userLastName')} />
+                <input type='text' id='userLastName' name='userLastName' value={values.userLastName}
+                  placeholder='Enter your lastname' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.userLastName && touched.userLastName ? (
+                    <p className='form-error'>{errors.userLastName}</p>
+                  ) : null }
               </div>
             </Col>
           </Row>
@@ -82,31 +113,44 @@ const Register = () => {
             <Col>
               <div className='form-group'>
                 <label htmlFor='userPassword'>Password</label>
-                <input type='text' id='userPassword' name='userPassword' value={formData.userPassword}
-                  placeholder='Enter your password' onChange={e => handleChange(e, 'userPassword')} />
+                <input type='password' id='userPassword' name='userPassword' value={values.userPassword}
+                  placeholder='Enter your password' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.userPassword && touched.userPassword ? (
+                    <p className='form-error'>{errors.userPassword}</p>
+                  ) : null }
               </div>
             </Col>
             <Col>
               <div className='form-group'>
                 <label htmlFor='confirmPassword'>ConfirmPassword</label>
-                <input type='text' id='confirmPassword' name='confirmPassword' value={formData.confirmPassword}
-                  placeholder='Enter your confirmPassword' onChange={e => handleChange(e, 'confirmPassword')} />
+                <input type='password' id='confirmPassword' name='confirmPassword' value={values.confirmPassword}
+                  placeholder='Enter your password' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.confirmPassword && touched.confirmPassword ? (
+                    <p className='form-error'>{errors.confirmPassword}</p>
+                  ) : null }
               </div>
             </Col>
           </Row>
+          <h4 style={{marginBottom: '15px', textDecoration:'underline', color: 'orangered'}}>Address</h4>
           <Row>
             <Col>
               <div className='form-group'>
                 <label htmlFor='addressLine'>AddressLine</label>
-                <input type='text' id='addressLine' name='addressLine' value={formData.addressLine}
-                  placeholder='Enter your addressLine' onChange={e => handleChange(e, 'addressLine')} />
+                <input type='text' id='addressLine' name='addressLine' value={values.addressLine}
+                  placeholder='Enter your addressLine' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.addressLine && touched.addressLine ? (
+                    <p className='form-error'>{errors.addressLine}</p>
+                  ) : null }
               </div>
             </Col>
             <Col>
               <div className='form-group'>
                 <label htmlFor='street'>Street</label>
-                <input type='text' id='street' name='street' value={formData.street}
-                  placeholder='Enter your street' onChange={e => handleChange(e, 'street')} />
+                <input type='text' id='street' name='street' value={values.street}
+                  placeholder='Enter your street' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.street && touched.street ? (
+                    <p className='form-error'>{errors.street}</p>
+                  ) : null }
               </div>
             </Col>
           </Row>
@@ -114,39 +158,48 @@ const Register = () => {
             <Col>
               <div className='form-group'>
                 <label htmlFor='city'>City</label>
-                <input type='text' id='city' name='city' value={formData.city}
-                  placeholder='Enter your city' onChange={e => handleChange(e, 'city')} />
+                <input type='text' id='city' name='city' value={values.city}
+                  placeholder='Enter your city' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.city && touched.city ? (
+                    <p className='form-error'>{errors.city}</p>
+                  ) : null }
               </div>
             </Col>
             <Col>
               <div className='form-group'>
                 <label htmlFor='state'>State</label>
-                <input type='state' id='state' name='state' value={formData.state}
-                  placeholder='Enter your state' onChange={e => handleChange(e, 'state')} />
+                <input type='state' id='state' name='state' value={values.state}
+                  placeholder='Enter your state' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.state && touched.state ? (
+                    <p className='form-error'>{errors.state}</p>
+                  ) : null }
               </div>
             </Col>
           </Row>
           <Row>
             <Col>
-            <div className='form-group'>
-              <label htmlFor='pincode'>Pincode</label>
-              <input type='text' id='pincode' name='pincode' value={formData.pincode}
-                placeholder='Enter your pincode' onChange={e => handleChange(e, 'pincode')} />
-            </div>
+              <div className='form-group'>
+                <label htmlFor='pincode'>Pincode</label>
+                <input type='text' id='pincode' name='pincode' value={values.pincode}
+                  placeholder='Enter your pincode' onChange={handleChange} onBlur={handleBlur} />
+                  {errors.pincode && touched.pincode ? (
+                    <p className='form-error'>{errors.pincode}</p>
+                  ) : null }
+              </div>
             </Col>
             <Col></Col>
           </Row>
 
           <button type='submit' className='register-button'>Register</button>
-          <div>
-          <p>Already have an account ? </p>
-          <button type='button' className='signin-button' onClick={handleLogin}>Sign In</button>
-        </div>
+          <div className='signin-container'>
+            <p style={{display: 'inline',marginBottom: '1rem', marginLeft: '28px', padding: '20px',paddingRight:'10px'}}>Already have an account ? </p>
+            <button type='button' className='signin-button' onClick={handleLogin1}>Sign In</button>
+          </div>
         </form>
-        
+
       </div>
       <div className='image-container'>
-        <img src={require('../../assets/login-page-image.png')} alt='image' className='image' />
+        <img src={require('../../assets/login-page-image.png')} alt='image' className='register-image' />
       </div>
     </div>
   )

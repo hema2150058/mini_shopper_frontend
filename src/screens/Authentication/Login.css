@@ -61,14 +61,14 @@ left: 220px
     margin-bottom: 15px;
 }
 
-label {
+.login-label {
     display: block;
     margin-bottom: 5px;
     color: #FF786CFF;
-    font-weight: 500;
+    font-weight: 700;
 }
 
-input {
+.login-input {
     width: 100%;
     padding: 8px;
     border: 1px solid #2c2a2a;

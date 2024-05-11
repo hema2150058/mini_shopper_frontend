@@ -63,17 +63,17 @@ const Login = () => {
                 <h3 className='heading'>Let's Get Started</h3>
                 <form onSubmit={handleLogin} className='login-form-container'>
                     <div className='form-group'>
-                        <label>Email</label>
-                        <input type='text' id='email' name='email' value={email}
+                        <label className='login-label'>Email</label>
+                        <input type='text' id='email' name='email' value={email} className='login-input'
                             placeholder='Enter your email' onChange={e => setEmail(e.target.value)}
                         />
                         {emailError ? <p>{emailError}</p> : null}
                         {/* will be a error msg here */}
                     </div>
                     <div className='form-group'>
-                        <label>Password</label>
+                        <label className='login-label'>Password</label>
                         <div className='password-input'>
-                        <input type={showPassword ? 'text' : 'password'}
+                        <input type={showPassword ? 'text' : 'password'} className='login-input'
                             id='password' name='password' value={password}
                             placeholder='Enter your password' onChange={e => setPassword(e.target.value)}
                         />
