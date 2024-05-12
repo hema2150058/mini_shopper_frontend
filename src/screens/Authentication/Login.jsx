@@ -3,6 +3,7 @@ import { useNavigate, NavLink } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faEye, } from '@fortawesome/free-solid-svg-icons';
 
+import { LoginUser } from '../../api/registerApi';
 import './Login.css';
 
 const Login = () => {
@@ -34,15 +35,34 @@ const Login = () => {
         }
         else if (!email.trim()) {
             setEmailError('Email is required');
-        } 
+        }
         else if (!email.trim()) {
             setPasswordError('Password is required');
         }
         else {
-            alert('Success');
-            navigate('/landingPage');
+            const userData = {
+                emailId: email,
+                userPassword: password
+            }
+            await LoginUser(userData)
+                .then(response => {
+                    console.log('Login is successfull ' + JSON.stringify(response));
+                    localStorage.setItem('userName',response.username);
+                    localStorage.setItem('token',response.jwtAuthToken);
+                    alert('Login Success');
+                    navigate('/landingPage');
+                })
+                .catch(error => {
+                    if (error.response) {
+                        const errormessage = error.response.data.ErrorMessage;
+                        alert('Error message : ' + errormessage);
+                    }
+                    else {
+                        console.error('error occured while sending the request' + error.response);
+                    }
+                })
+
         }
-        //alert('success');
     }
 
     const togglePasswordVisibility = () => {
@@ -73,19 +93,19 @@ const Login = () => {
                     <div className='form-group'>
                         <label className='login-label'>Password</label>
                         <div className='password-input'>
-                        <input type={showPassword ? 'text' : 'password'} className='login-input'
-                            id='password' name='password' value={password}
-                            placeholder='Enter your password' onChange={e => setPassword(e.target.value)}
-                        />
-                        <span className='toggleicon' onClick={togglePasswordVisibility}>{showPassword ? <FontAwesomeIcon icon={faEye} color='grey' /> : <FontAwesomeIcon icon={faEyeSlash} color='grey' />}</span>
-                        {passwordError ? <p>{passwordError}</p> : null}
+                            <input type={showPassword ? 'text' : 'password'} className='login-input'
+                                id='password' name='password' value={password}
+                                placeholder='Enter your password' onChange={e => setPassword(e.target.value)}
+                            />
+                            <span className='toggleicon' onClick={togglePasswordVisibility}>{showPassword ? <FontAwesomeIcon icon={faEye} color='grey' /> : <FontAwesomeIcon icon={faEyeSlash} color='grey' />}</span>
+                            {passwordError ? <p>{passwordError}</p> : null}
                         </div>
                     </div>
                     <button type='submit' className='login-button'>Login</button>
                     <div className='signup-container'>
-                        <p style={{display: 'inline',marginBottom: '1rem', marginLeft: '28px', padding: '20px',paddingRight:'10px'}}>New User ? </p>
+                        <p style={{ display: 'inline', marginBottom: '1rem', marginLeft: '28px', padding: '20px', paddingRight: '10px' }}>New User ? </p>
                         <button type='button' className='signup-button' onClick={handleRegister}>Sign up</button>
-                        
+
                     </div>
                 </form>
             </div>
