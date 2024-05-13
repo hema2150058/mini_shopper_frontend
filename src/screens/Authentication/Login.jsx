@@ -50,7 +50,8 @@ const Login = () => {
                     localStorage.setItem('userName',response.username);
                     localStorage.setItem('token',response.jwtAuthToken);
                     alert('Login Success');
-                    navigate('/landingPage');
+                    console.log('naviagte to products');
+                    navigate('/products');
                 })
                 .catch(error => {
                     if (error.response) {

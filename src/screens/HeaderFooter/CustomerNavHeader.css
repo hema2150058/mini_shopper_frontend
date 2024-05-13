@@ -1,0 +1,90 @@
+.nav-container {
+    background-color: #FFEBEE;
+   
+}
+
+
+.nav-header-logo {
+    margin-left: 0px;
+    padding: 10px;
+}
+
+#basic-navbar-nav {
+    /* background-color: #FFCCCC; */
+    font-size: 20;
+    font-weight: 400;
+    margin-right: 30%;
+    margin-left: 225px;
+    padding-left: 80px;
+
+}
+
+.nav-fields {
+    padding-right: 10px;
+}
+
+/* #FFCCCC //welcoem */
+
+.header-menu {
+    position: absolute; 
+    top: 3px; 
+    left: 500px; 
+    width: 293px; 
+    height: 60px; 
+    display: flex; 
+    align-items: center; 
+    font-family: Catamaran; /* Body */
+    font-size: 20px; 
+    line-height: 28px; 
+    font-weight: 500; 
+    opacity: 1; 
+    /* //padding-right: 20px; */
+}
+
+
+.header-menu .nav-link.active{
+  color: red;
+ }
+
+ .dropdown-item:hover {
+  background-color: #FF786CFF;
+ }
+
+ .svg-inline--fa {
+  height: 21px;
+ }
+ 
+ .cart-icon {
+  color: grey;
+  margin-top:4px;
+  margin-right: 5px;
+  border: none;
+ }
+
+ .cart-icon:hover {
+  color: #FF786CFF;
+ }
+
+ .cart-icon:active {
+  transform: scale(0.98);
+  box-shadow: 3px 2px 22px 1px #FF786CFF;
+ }
+ 
+ .profile-dropdown {
+  padding-left: -5px;
+  /* background-color: blue; */
+  display: inline;
+  width: 10%;
+ }
+
+ .dropdown-item:hover {
+  background-color: #FFEBEE;
+ }
+ .dropdown-item:active {
+  color: #FF786CFF;
+ }
+ 
+ /* .profile-drop-tem {
+  float: left; padding: 5px; 
+  left: -10rem;
+ } */

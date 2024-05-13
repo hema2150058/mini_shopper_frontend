@@ -1,22 +1,20 @@
-import React, { Component } from 'react'
-import { Route, Navigate, Outlet } from 'react-router-dom';
-import Login from './Login';
-import LandingPage from './LandingPage';
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import '../Customer/Products.css';
 
-const AuthRoute = ({isAuthenticated}) => {
+const AuthRoute = () => {
     
     return (
-        isAuthenticated ? <LandingPage/> : <Login />
-    )
-
-};
-export default AuthRoute;
-
-const ProtectedRoutes = ({auth}) => {
-    
-    return (auth === true ? <Outlet /> : <Navigate to="/" replace/>)
-}
-
-const AuthRoute1 = ({isAuthenticated}) => {
-    return (isAuthenticated ? <Outlet /> : <Navigate to="/" replace/>)
-};
+<Navbar bg="ligt" data-bs-theme="light">
+        <Container>
+          <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+          <Nav variant='underline'>
+            <Nav.Link href="#home" >Home</Nav.Link>
+            <Nav.Link href="#features">Features</Nav.Link>
+            <Nav.Link href="#pricing">Pricing</Nav.Link>
+          </Nav>
+        </Container>
+      </Navbar>
+    )}
+    export default AuthRoute;
