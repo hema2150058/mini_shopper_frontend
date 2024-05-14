@@ -21,9 +21,10 @@ const CustomerNavHeader = () => {
   }
   const handleLogout = () => {
         localStorage.clear();
+        
+        navigate('/login');
         window.location.reload();
         console.log('logout clicked');
-        navigate('/login');
     }
   
 
