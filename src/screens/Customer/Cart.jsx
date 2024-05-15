@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import CustomerNavHeader from '../HeaderFooter/CustomerNavHeader';
 import axios from 'axios';
+import { useNavigate, NavLink } from 'react-router-dom';
+
 import { uploadExcel, getCartItems, updateCart, removeFromCart, placeOrder } from '../../api/CustomerApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUpload, faEye, } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faSquareMinus, faSquarePlus,faTrashCan, faCartShopping, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import './Cart.css'
+import { Navigate } from 'react-router';
 
 const Cart = () => {
+
+  const navigate = useNavigate();
 
   const [cartItems, setCartItems] = useState([]);
   const [itemsPrice, setItemsPrice] = useState(0);
@@ -33,30 +38,30 @@ const Cart = () => {
     };
 
     fetchCartItems();
-    
+
   }, []);
 
   useEffect(() => {
     const calculateItemsPrice = () => {
       let total = 0;
       cartItems.forEach(item => {
-total += item.price * item.quantity;
+        total += item.price * item.quantity;
       });
       setItemsPrice(total);
-      
+
     };
     console.log(itemsPrice);
     calculateItemsPrice();
   }, [cartItems]);
-  
-    // const calculateItemsPrice = async () => {
-    //   let total = 0;
-    //   console.log(cartItems.price, cartItems.quantity);
-    //   cartItems.forEach(item => {
-    //     total += item.price  * item.quantity;
-    //   });
-    //   setItemsPrice(total);
-    // };
+
+  // const calculateItemsPrice = async () => {
+  //   let total = 0;
+  //   console.log(cartItems.price, cartItems.quantity);
+  //   cartItems.forEach(item => {
+  //     total += item.price  * item.quantity;
+  //   });
+  //   setItemsPrice(total);
+  // };
 
   let itemFinalPrice = 0;
   function getItemsPrice() {
@@ -77,26 +82,24 @@ total += item.price * item.quantity;
   async function increaseQuantity(productId) {
     const userId = localStorage.getItem('userName');
     const quantity = cartItems.find(p => p.productId == productId).quantity + 1;
-    await updateCart({ userId: userId, productId: productId, quantity: quantity })
+    await updateCart({ userId, productId, quantity })
       .then((res) => {
         if (res.status == 200) {
           console.log(productId);
-          console.log(this.cartItems);
+          console.log(cartItems);
           console.log(quantity);
-          cartItems.find(p => p.productId == productId).quantity = quantity;
-          console.log(this.cartItems);
-          //calculateItemsPrice();
-          // this.cart.map(p => p.id == id ? { ...p, qty: p.qty + 1 } : p);
-
-          // this.cart.push({ userId: userId, productId: productId, quantity: quantity });
-
+          const updatedCart = cartItems.map(p => p.productId === productId?{ ...p,quantity}: p);
+          setCartItems(updatedCart);
+          console.log(cartItems);
+          console.log(updatedCart);
         }
       })
-
+      .catch(error => {
+        console.log('error increasing item quantity', error);
+      })
   };
 
   async function decreaseQuantity(productId) {
-
     const userId = localStorage.getItem('userName');
     let quantity = cartItems.find(p => p.productId == productId).quantity;
     if (quantity > 1) quantity = quantity - 1;
@@ -104,17 +107,13 @@ total += item.price * item.quantity;
     await updateCart({ userId: userId, productId: productId, quantity: quantity })
       .then((res) => {
         if (res.status == 200) {
-          console.log(productId);
-          console.log(this.cartItems);
-          console.log(quantity);
-          this.cartItems.find(p => p.productId == productId).quantity = quantity;
-          console.log(this.cartItems);
-          //calculateItemsPrice();
-          // this.cart.map(p => p.id == id ? { ...p, qty: p.qty + 1 } : p);
-
-          // this.cart.push({ userId: userId, productId: productId, quantity: quantity });
-
+          const updatedCart = cartItems.map(p => p.productId === productId ? {...p,quantity}: p);
+          setCartItems(updatedCart);
+          console.log(updatedCart);
         }
+      })
+      .catch(error => {
+        console.log('error decreasing item quantity', error);
       })
   }
 
@@ -123,7 +122,7 @@ total += item.price * item.quantity;
     const userId = localStorage.getItem('userName');
     const removeproduct = { "userId": userId, "productId": productId }
     console.log(productId, userId);
-    try{
+    try {
       console.log('inside the deletehandle');
       fetch('http://localhost:8082/removeFromCart', {
         method: "DELETE",
@@ -136,13 +135,16 @@ total += item.price * item.quantity;
           "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH",
         },
       })
-        .then(response => { console.log(response.body);
+        .then(response => {
+          console.log(response.body);
+          const removedCart = cartItems.filter(p => p.productId != productId);
+          setCartItems(removedCart);
           //calculateItemsPrice(); 
         })
         .catch(error => {
           console.log(error);
         });
-    } catch(error) {
+    } catch (error) {
       console.log('getting error removing item', error);
     }
   }
@@ -205,18 +207,20 @@ total += item.price * item.quantity;
     }));
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log(e.value);
-  //   try {
-  //     await placeOrder(e.value).then((res) => {
-  //       console.log(res.data);
-  //     })
-  //     // Implement your order placement logic here using axios.post or any other method
-  //   } catch (error) {
-  //     console.error('Error placing order:', error);
-  //   }
-  // };
+  const handleSubmit = async (e) => {
+    const userId = localStorage.getItem('userName');
+    e.preventDefault();
+    console.log(e.value);
+    try {
+      await placeOrder({...billingForm, userId}).then((res) => {
+        console.log(res.data);
+        navigate('/purchaseHistory');
+      })
+      // Implement your order placement logic here using axios.post or any other method
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
+  };
 
 
 
@@ -226,20 +230,20 @@ total += item.price * item.quantity;
 
 
       {/* <div className='cart-conatiner'>
-        {cart.map((carts) => (
-          <div key={carts.cartId}>
-            <div className='cart-items'>
-              <div>{carts.userId}</div>
-              <div>{carts.productId}</div>
-              <div>{carts.quantity}</div>
-              <div>{carts.price}</div>
-            </div>
+      {cart.map((carts) => (
+        <div key={carts.cartId}>
+          <div className='cart-items'>
+            <div>{carts.userId}</div>
+            <div>{carts.productId}</div>
+            <div>{carts.quantity}</div>
+            <div>{carts.price}</div>
           </div>
-        )
-        )}
-      </div> */}
+        </div>
+      )
+      )}
+    </div> */}
 
-      <div>
+      <div className='cart-main-container'>
         {!cartItems.length ? (
           <div className="w-75 mt-5 m-auto rounded">
             <div className="card w-75 m-auto bg-white rounded mt-5 px-5 py-2">
@@ -252,91 +256,147 @@ total += item.price * item.quantity;
             </div>
           </div>
         ) : (
-          <div>
-            <div className="fs-2 text-center pt-5 pb-5 ls-2 fw-bold">My Cart ({cartItems.length} items)</div>
-            <div className="container px-5">
-              <form>
-                <div className="row justify-content-between">
-                  <div className="col-8 pe-5">
-                    <div className="row mb-4 p-2 pt-4 bg-white">
-                      <div className="fs-5">
-                        <span>Order Summary</span>
-                      </div>
-                      <table className="table mt-4" style={{ borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr className="text-secondary text-center">
-                            <th className="border-none">Name</th>
-                            <th className="border-none">Price</th>
-                            <th className="border-none">Quantity</th>
-                            <th className="border-none">Total</th>
-                            <th className="border-none"></th>
-                          </tr>
-                        </thead>
-                        <tbody className="align-middle">
-                          {cartItems.map(item => (
-                            <tr key={item.productId} className="">
-                              <td className="border-none">
-                                <div className="fw-bold ls-1">
-                                  <img src="../../../assets/BP-Tablet.png" alt="user-image" width="70" height="70" />
-                                  {item.productName}
-                                </div>
-                              </td>
-                              <td className="text-center border-none">
-                                {item.price}
-                              </td>
-                              <td className="border-none">
-                                <div className="input-group d-flex justify-content-center">
-                                  <button type="button" className="quantity-left-minus btn btn-danger btn-number text-center" data-type="minus" data-field="">
-                                    <span className="fa fa-minus"></span>
-                                  </button>
-                                  <input type="text" id="quantity" disabled value={item.quantity} name="quantity" className="text-center" style={{ width: '40px' }} min="1" />
-                                  <button type="button" className="quantity-right-plus btn btn-success btn-number" data-type="plus" data-field="">
-                                    <span className="fa fa-plus"></span>
-                                  </button>
-                                </div>
-                              </td>
-                              <td className="text-center border-none">
-                                {(item.price *item.quantity).toFixed(2)}
-                              </td>
-                              <td className="border-none cursor-pointer">
-                                <button type='button' onClick={() => removeItemFromCart(item.productId)}>
-                                  Remove
-                                </button>
-                              </td>
+          <>
+            <div>
+              <div className="fs-2 text-center pt-5 pb-5 ls-2 fw-bold" style={{color:'rgb(239 100 88 / 86%);'}}>My Cart ({cartItems.length} items)</div>
+
+
+
+
+
+              <div className="cart-container px-5">
+                <form>
+                  <div className="row justify-content-between">
+                    <div className="col-8 pe-5">
+                      <div className="row mb-4 p-2 pt-4 bg-white" style={{width: '40em'}}>
+                        <div className="fs-5">
+                          <FontAwesomeIcon size='lg' icon={faCartShopping} />
+                          <span style={{marginLeft: '7px'}}>Order Summary</span>
+                        </div>
+                        <table className="table mt-4" style={{ borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr className="text-secondary text-center">
+                              <th className="border-none">Name</th>
+                              <th className="border-none">Price</th>
+                              <th className="border-none">Quantity</th>
+                              <th className="border-none">Total</th>
+                              <th className="border-none"></th>
+                              <th className="border-none"></th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                  <div className="col-4 p-4">
-                    <div className="fw-bold fs-5 ls-1">Payment method</div>
-                    <div className="w-100 mt-3">
-                      <h2>Summary</h2>
-                      <div>
-                        <span>Subtotal:</span>
-                        <span>{itemsPrice.toFixed(2)}</span>
+                          </thead>
+                          <tbody className="align-middle">
+                            {cartItems.map(item => (
+                              <tr key={item.productId} className="">
+                                <td className="border-none">
+                                  <div className=" ls-1">
+                                    <img src="../../../assets/BP-Tablet.png" alt="img" width="70" height="70" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    {item.productName}
+                                  </div>
+                                </td>
+
+                                <td className="text-center border-none">
+                                  {(item.price).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                </td>
+
+                                <td className="border-none">
+                                  <div className="input-group d-flex justify-content-center">
+                                    <span className="input-group-btn">
+                                      {/* <button type="button" onClick={() => decreaseQuantity(item.productId)} className="quantity-left-minus btn btn-danger btn-number text-center" data-type="minus" data-field=""> */}
+                                        <FontAwesomeIcon size='1x' icon={faSquareMinus} className='cart-minus-icon'  transform=" down-5 left-5" onClick={() => decreaseQuantity(item.productId)}/>
+                                      {/* </button> */}
+                                    </span>
+                                    <input type="text" id="quantity" disabled value={item.quantity} name="quantity" className="text-center" style={{ width: '40px', borderRadius: '10px', borderColor:'darkgrey' }} min="1" />
+                                    <span className="input-group-btn">
+                                      {/* <button type="button" onClick={() => increaseQuantity(item.productId)} className="quantity-right-plus btn btn-success btn-number" data-type="plus" data-field=""> */}
+                                        <FontAwesomeIcon size='1x' icon={faSquarePlus} className='cart-plus-icon' onClick={() => increaseQuantity(item.productId)} color='green' transform=" down-5 right-5"/>
+                                      {/* </button> */}
+                                    </span>
+                                  </div>
+                                </td>
+
+                                <td className="text-center" style={{borderRadius: '5px'}}>
+                                  <div style={{borderRadius: '5px'}}>{(item.price * item.quantity).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</div>
+                                </td>
+                                <td className="border-none cursor-pointer">
+                                  <FontAwesomeIcon  color='red' icon={faTrashCan} onClick={() => removeItemFromCart(item.productId)} />
+                                  {/* <button type='button' onClick={() => removeItemFromCart(item.productId)}>
+                             Remove
+                            </button> */}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
-                      <div>
-                        <span>Delivery Fee:</span>
-                        <span>{deliveryCharge.toFixed(2)}</span>
+                      <div className="row my-4">
+                        <div className="col-6">
+
+                        </div>
+                        <div className="col-6">
+
+                        </div>
                       </div>
-                      <div>
-                        <span>Total:</span>
-                        <span>{(itemsPrice).toFixed(2)}</span>
+                      <div className="row p-2 pt-4 mb-5 bg-white">
+                        <div className="fs-5 mb-3">
+                          <FontAwesomeIcon icon={faCircleUser} />
+                          <span> Customer Information</span>
+                        </div>
+
+
+
+                        <div className="row mb-4 w-100  justify-content-between m-auto">
+                          <div className="form-group col-6 p-0 pe-2">
+                            <div className="mt-2 mb-1">Full Name</div>
+                            <input type="text" id="billingName" name="billingName" placeholder="Full Name"
+                               value={billingForm.billingName} className="w-100 p-2 bg-grey" onChange={handleChange} />
+                            <div>
+                              {/* *ngIf="billingForm.controls['billingName'].invalid && (billingForm.controls['billingName'].dirty || billingForm.controls['billingName'].touched)"
+                            class="invalid-feedback mb-3">
+                            Customer Name is required */}
+                              {/* -------need to write error msg here-------- */}
+                            </div>
+
+                          </div>
+
+                          <div className="form-group col-6 p-0">
+                            <div className="mt-2 mb-1">Phone Number</div>
+                            <input type="text" id="billingPhNumber" name="billingPhNumber" placeholder="Phone Number"
+                               value={billingForm.billingPhNumber} className="w-100 p-2 bg-grey" onChange={handleChange}/>
+                            <div>
+                              {/* *ngIf="billingForm.controls['billingPhNumber'].invalid && (billingForm.controls['billingPhNumber'].dirty || billingForm.controls['billingPhNumber'].touched)"
+                              class="invalid-feedback mb-3">
+                              <div /> *ngIf="billingForm.controls['billingPhNumber'].errors?.['required']">Last Name is required. */}
+                              {/* -------need to write error msg here-------- */}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="form-group mb-2">
+                          <div className="mt-2 mb-1">Address</div>
+                          <input type="text" id="billingAddress" name="billingAddress" placeholder="Address"
+                            value={billingForm.billingAddress} className="w-100 p-2 bg-grey" onChange={handleChange}/>
+                          <div className="invalid-feedback" >
+                            {/* *ngIf="billingForm.controls['billingAddress'].invalid && (billingForm.controls['billingAddress'].dirty || billingForm.controls['billingAddress'].touched)"
+                              class="invalid-feedback ">
+                            <div /> *ngIf="billingForm.controls['billingAddress'].errors?.['required']">Last Name is required.</></div>
+                              </> */}
+
+                          </div>
+                        </div>
+                        <button type='button' className='w-100 btn btn-success px-5 py-2' onClick={handleSubmit}>Proceed to order</button>
+                        </div>
                       </div>
-                      <div>
-                        <button type="submit">Proceed to Payment</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+                    </div >
+                </form >
+              </div >
+
+            </div >
+          </>)
+        }
+      </div >
+    </div >
+
   )
 }
 

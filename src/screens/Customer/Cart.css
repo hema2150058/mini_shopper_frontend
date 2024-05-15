@@ -38,3 +38,35 @@
 .upload-icon {
     padding-bottom: 5px;
 } */
+
+.cart-main-container {
+    background-color: rgb(248, 152, 143);
+}
+
+.cart-container {
+    margin-left: 17em;
+}
+
+
+/* -------icons-------- */
+.cart-plus-icon {
+    color: #52AE77FF;
+}
+.cart-plus-icon:hover {
+    color: green;
+    border-color: green;
+}
+.cart-plus-icon:active {
+    color: #52AE77FF;
+}
+/* FF786CFF */
+
+.cart-minus-icon {
+    color: #FF786CFF;
+}
+.cart-minus-icon:hover {
+    color: red;
+}
+.cart-minus-icon:active {
+    color: #FF786CFF;
+}
