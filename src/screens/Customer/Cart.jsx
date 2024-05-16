@@ -268,7 +268,7 @@ const Cart = () => {
                 <form>
                   <div className="row justify-content-between">
                     <div className="col-8 pe-5">
-                      <div className="row mb-4 p-2 pt-4 bg-white" style={{width: '40em'}}>
+                      <div className="row mb-4 p-2 pt-4 bg-white" style={{width: '37em'}}>
                         <div className="fs-5">
                           <FontAwesomeIcon size='lg' icon={faCartShopping} />
                           <span style={{marginLeft: '7px'}}>Order Summary</span>
@@ -328,10 +328,11 @@ const Cart = () => {
                             ))}
                           </tbody>
                         </table>
+                        <div className='totalprice-div'>Total Price : <span style={{fontWeight: '500',marginLeft: '30px'}}>{itemsPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></div>
                       </div>
                       <div className="row my-4">
                         <div className="col-6">
-
+                            
                         </div>
                         <div className="col-6">
 

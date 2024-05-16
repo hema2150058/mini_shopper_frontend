@@ -16,11 +16,46 @@ import UserProfile from './screens/Authentication/UserProfile';
 import AllCustomers from './screens/Shopper/AllCustomers';
 import AllOrders from './screens/Shopper/AllOrders';
 import PendingOrders from './screens/Shopper/PendingOrders';
+import ProtectedRoute from './ProtectedRoute';
+import AddressForm from './components/Test2';
 
 
 function App() {
 
-  const isAuthenticated = !!localStorage.getItem('userName');
+  const userId = localStorage.getItem('userName');
+  
+  const ROLES = {
+    ADMIN: 'admin',
+    USER: 'user',
+  };
+  const isAuthenticated = () => {
+    // Check if user is logged in, and their role
+    // For demonstration, let's assume the user is logged in as an admin
+    if(userId === 'Shopper123'){
+      //let rolee = ROLES.ADMIN
+    return {
+      isLoggedIn: true,
+      role: ROLES.ADMIN, 
+    }}
+  };  
+
+  // const ProtectedRoute = ({ component: Component, allowedRoles, ...rest }) => {
+  //   const { isLoggedIn, role } = isAuthenticated();
+   
+  //   return (
+  //     <Route
+  //       {...rest}
+  //       render={(props) => {
+  //         if (isLoggedIn && allowedRoles.includes(role)) {
+  //           return <Component {...props} />;
+  //         } else {
+  //           return <Navigate to="/login" />;
+  //         }
+  //       }}
+  //     />
+  //   );
+  // };
+  
   //console.log(isAuthenticated);
   return (
     <Router>
@@ -50,6 +85,8 @@ function App() {
         <Route path='/allOrders' Component={AllOrders} />
 
         <Route path='authNav' Component={AuthRoute} />
+        <Route path='/updateAddress' Component={AddressForm} />
+        {/* <Route path='/admin'  element= {<ProtectedRoute component={AllCustomers}  allowedRoles={[ROLES.ADMIN]} />}  /> */}
       </Routes>
     </Router>
 

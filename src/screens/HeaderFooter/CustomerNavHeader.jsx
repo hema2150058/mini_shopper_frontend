@@ -8,14 +8,18 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import { faCartShopping, faEye, } from '@fortawesome/free-solid-svg-icons';
 import { faUser, } from '@fortawesome/free-regular-svg-icons';
 
-import { NavLink } from "react-router-dom";
+import { NavLink , useLocation} from "react-router-dom";
 import { useNavigate } from "react-router";
-
+ 
 import './CustomerNavHeader.css';
 
-const CustomerNavHeader = () => {
+const CustomerNavHeader = ({cartSize=0}) => {
 
+  console.log(cartSize);
+  //let cartSize1 = cartSize();
   const navigate = useNavigate();
+  const currentLocation = useLocation().pathname;
+  console.log(currentLocation);
   const handleCart =() => {
     navigate('/cart');
   }
@@ -50,11 +54,13 @@ const CustomerNavHeader = () => {
               </NavDropdown.Item>
             </NavDropdown> */}
           </Nav>
-        </Navbar.Collapse>
+        </Navbar.Collapse >
+        { currentLocation==='/products' ? 
+        (
         <div className='cart-icon' onClick={handleCart}> 
-        <FontAwesomeIcon size='lg' icon={faCartShopping} />
+        <FontAwesomeIcon size='lg' icon={faCartShopping} />&nbsp;{cartSize}
         </div>
-        
+        ): <div></div>}
 
       </Container>
       <NavDropdown className='profile-dropdown' title={

@@ -15,6 +15,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   let userId = localStorage.getItem('userName');
+  const [cartSize, setCartSize] = useState(0);
 
   useEffect(() => {
     // Fetch products
@@ -56,6 +57,9 @@ const Products = () => {
   }
 
   const getCartSize = () => {
+    console.log(cart.length);
+    //setCartSize(cartSize);
+    //console.log(cartSize);
     return cart.length;
   };
 
@@ -255,11 +259,11 @@ const Products = () => {
     }
   };
 
-
+  
 
   return (
     <div style={{ marginTop: '74px' }}>
-      <CustomerNavHeader />
+      <CustomerNavHeader cartSize={cart.length} />
 
 
 

@@ -6,6 +6,16 @@ const config = {
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH"
     }
 };
+const token = localStorage.getItem('token');
+const configWithHeader = {
+    headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH",
+        'content-type': 'application/json',
+        'accept': 'application/json',
+        'Authorization': 'Bearer ' + token
+    }
+};
 
 export async function LoginUser(userData) {
     const {data} = await axios.post('http://localhost:8083/signin', userData, config);
@@ -21,4 +31,20 @@ export async function RegisterNewUser(requestData) {
     console.log('response data from register api is ' + JSON.stringify( data));
     console.log('email is '+data.email);
     return data;
+}
+
+
+export async function updateAddress(userId,address) {
+   // const userId = '';
+    //const config2 = '';
+    console.log(address);
+    return await axios.put('http://localhost:8083/updateAddress/' +userId, address, configWithHeader);
+}
+
+export async function getPersonalDetails(userId) {
+    return await axios.get('http://localhost:8083/getCustomerDetails/' +userId, configWithHeader);
+}
+
+export async function getAllCustomersDetails() {
+    return await axios.get('http://localhost:8083/getAllCustomersData', configWithHeader);
 }
