@@ -52,3 +52,11 @@ export async function placeOrder(billingDetails) {
     console.log(billingDetails);
     return await axios.post('http://localhost:8082/placeOrder', billingDetails, config);
 }
+
+export async function getOrderDetails(orderNumber) {
+    return await axios.get('http://localhost:8082/getOrderDetails/'+orderNumber,config);
+}
+
+export async function getPurchaseHistory(userId) {
+    return await axios.get('http://localhost:8082/purchaseHistory/'+userId,config);
+}
