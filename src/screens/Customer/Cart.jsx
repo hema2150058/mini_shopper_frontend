@@ -2,20 +2,23 @@ import React, { useEffect, useState } from 'react'
 import CustomerNavHeader from '../HeaderFooter/CustomerNavHeader';
 import axios from 'axios';
 import { useNavigate, NavLink } from 'react-router-dom';
-
+import { getPersonalDetails, updateAddress } from '../../api/registerApi';
+import 'bootstrap/dist/css/bootstrap.css';
+import { Button, Col, Row } from 'react-bootstrap';
 import { uploadExcel, getCartItems, updateCart, removeFromCart, placeOrder } from '../../api/CustomerApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faSquareMinus, faSquarePlus,faTrashCan, faCartShopping, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faSquareMinus, faSquarePlus, faTrashCan, faCartShopping, faPenToSquare, faMinus } from '@fortawesome/free-solid-svg-icons';
 import './Cart.css'
 import { Navigate } from 'react-router';
+import { number } from 'yup';
 
 const Cart = () => {
 
   const navigate = useNavigate();
+  const userId = localStorage.getItem('userName');
 
   const [cartItems, setCartItems] = useState([]);
   const [itemsPrice, setItemsPrice] = useState(0);
-  const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [billingForm, setBillingForm] = useState({
     billingName: '',
     billingAddress: '',
@@ -88,7 +91,7 @@ const Cart = () => {
           console.log(productId);
           console.log(cartItems);
           console.log(quantity);
-          const updatedCart = cartItems.map(p => p.productId === productId?{ ...p,quantity}: p);
+          const updatedCart = cartItems.map(p => p.productId === productId ? { ...p, quantity } : p);
           setCartItems(updatedCart);
           console.log(cartItems);
           console.log(updatedCart);
@@ -107,7 +110,7 @@ const Cart = () => {
     await updateCart({ userId: userId, productId: productId, quantity: quantity })
       .then((res) => {
         if (res.status == 200) {
-          const updatedCart = cartItems.map(p => p.productId === productId ? {...p,quantity}: p);
+          const updatedCart = cartItems.map(p => p.productId === productId ? { ...p, quantity } : p);
           setCartItems(updatedCart);
           console.log(updatedCart);
         }
@@ -199,21 +202,125 @@ const Cart = () => {
   //   fetchCart();
   // }, []);
 
-  const handleChange = (e) => {
+
+
+  // ---------------------billing form data-------------------
+
+  const [addressData, setAddressData] = useState({
+    addressLine: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: number
+  });
+  const [billingData, setBillingData] = useState({
+    billingName: '',
+    billingPhNumber: '',
+    addressLine: '',
+    street: '',
+    city: '',
+    state: '',
+    pincode: ''
+  });
+  const token = localStorage.getItem('token');
+  const [editMode, setEditMode] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    // Fetch address data from backend when component mounts
+    fetchAddressData();
+  }, []);
+
+  const fetchAddressData = async () => {
+    // Make API call to fetch address data from backend
+    try {
+      const response = await getPersonalDetails(userId);
+      if (response.status === 200) {
+        console.log('fetched personal details', response.data.address);
+        addressData.addressLine = response.data.address.addressLine;
+        addressData.street = response.data.address.street;
+        addressData.city = response.data.address.city;
+        addressData.state = response.data.address.state;
+        addressData.pincode = response.data.address.pincode;
+        setAddressData(response.data.address);
+        billingData.billingName = userId;
+        billingData.billingPhNumber = '';
+        billingData.addressLine = response.data.address.addressLine;
+        billingData.street = response.data.address.street;
+        billingData.city = response.data.address.city;
+        billingData.state = response.data.address.state;
+        billingData.pincode = response.data.address.pincode;
+        console.log(addressData);
+        console.log(billingData);
+      }
+    }
+    catch (error) {
+      console.error('Error fetching address data:', error);
+    };
+  };
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setBillingForm(prevState => ({
+    setAddressData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+    setBillingData(prevState => ({
       ...prevState,
       [name]: value
     }));
   };
 
   const handleSubmit = async (e) => {
-    const userId = localStorage.getItem('userName');
     e.preventDefault();
-    console.log(e.value);
+    // Make API call to update address data on backend
+    //if(!validateForm()) return;
+    if (editMode) {
+      if (validateForm()) {
+        try {
+          const updatedAddress = await updateAddress(userId, addressData);
+          if (updatedAddress.status === 200) {
+            console.log('Address data updated successfully:', updatedAddress.data);
+            const formatdata = {
+              addressLine: addressData.addressLine,
+              street: addressData.street,
+              city: addressData.city,
+              state: addressData.state,
+              pincode: addressData.pincode
+            }
+            // Convert address data to string format and make POST request to another API
+            const formattedAddress = Object.values(formatdata).join(', ');
+            console.log(formattedAddress);
+            //navigate('/checkout');
+            submitBillingData(formattedAddress);
+          }
+        }
+        catch (error) {
+          console.error('Error updating address data:', error);
+        };
+      } else alert('All feilds are mandatory. Please enter all the details');
+    } else {
+      const formatdata = {
+        addressLine: addressData.addressLine,
+        street: addressData.street,
+        city: addressData.city,
+        state: addressData.state,
+        pincode: addressData.pincode
+      }
+      const formattedAddress = Object.values(formatdata).join(', ');
+      // Make POST request with formatted address data
+      submitBillingData(formattedAddress);
+    }
+  };
+
+  const submitBillingData = async (formattedAddress) => {
     try {
-      await placeOrder({...billingForm, userId}).then((res) => {
+      let billName = billingData.billingName;
+      let billPhno = billingData.billingPhNumber;
+      console.log(billName, billPhno);
+      await placeOrder({ billingName: billName, billingphoneNum: billPhno, billingAddress: formattedAddress, userId: userId, }).then((res) => {
         console.log(res.data);
+        localStorage.setItem('orderNumber',res.data.orderNumber);
         navigate('/purchaseHistory');
       })
       // Implement your order placement logic here using axios.post or any other method
@@ -221,6 +328,54 @@ const Cart = () => {
       console.error('Error placing order:', error);
     }
   };
+
+  const validateForm = () => {
+    // Simple validation for required fields
+    const errors = {};
+    Object.keys(billingData).forEach(key => {
+      if (!billingData[key]) {
+        errors[key] = 'This feild is required';
+      }
+    });
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleEditToggle = () => {
+    //e.preventDefault();
+    // Toggle edit mode
+    setEditMode(prevMode => !prevMode);
+    setErrors({});
+  };
+
+  const handleEmptyCart = () => {
+    navigate('/products');
+  }
+
+
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setBillingForm(prevState => ({
+  //     ...prevState,
+  //     [name]: value
+  //   }));
+  // };
+
+  // const handleSubmit1 = async (e) => {
+  //   const userId = localStorage.getItem('userName');
+  //   e.preventDefault();
+  //   console.log(e.value);
+  //   try {
+  //     await placeOrder({...billingForm, userId}).then((res) => {
+  //       console.log(res.data);
+  //       navigate('/purchaseHistory');
+  //     })
+  //     // Implement your order placement logic here using axios.post or any other method
+  //   } catch (error) {
+  //     console.error('Error placing order:', error);
+  //   }
+  // };
 
 
 
@@ -250,7 +405,7 @@ const Cart = () => {
               <div className="card-body text-green text-center">
                 <div className="fs-4 mb-2 text-green ls-3">Your Cart is Empty</div>
                 <div>
-                  <button type="button" className="fs-5 mt-4 mb-2 ls-2 snbtn shadow btn rounded text-light bg-green fw-bold">CONTINUE SHOPPING</button>
+                  <button type="button" className="fs-5 mt-4 mb-2 ls-2 snbtn shadow btn rounded text-light proceed-to-order fw-bold" onClick={handleEmptyCart}>CONTINUE SHOPPING</button>
                 </div>
               </div>
             </div>
@@ -258,7 +413,7 @@ const Cart = () => {
         ) : (
           <>
             <div>
-              <div className="fs-2 text-center pt-5 pb-5 ls-2 fw-bold" style={{color:'rgb(239 100 88 / 86%);'}}>My Cart ({cartItems.length} items)</div>
+              <div className="fs-2 text-center pt-5 pb-5 ls-2 fw-bold" style={{ color: 'rgb(239 100 88 / 86%)' }}>My Cart ({cartItems.length} items)</div>
 
 
 
@@ -266,14 +421,14 @@ const Cart = () => {
 
               <div className="cart-container px-5">
                 <form>
-                  <div className="row justify-content-between">
-                    <div className="col-8 pe-5">
-                      <div className="row mb-4 p-2 pt-4 bg-white" style={{width: '37em'}}>
+                  <div className="form-main-container">
+                    <div className="form-inside-container">
+                      <div className="cart-details" style={{ width: '37em' }}>
                         <div className="fs-5">
                           <FontAwesomeIcon size='lg' icon={faCartShopping} />
-                          <span style={{marginLeft: '7px'}}>Order Summary</span>
+                          <span style={{ marginLeft: '7px' }}>Order Summary</span>
                         </div>
-                        <table className="table mt-4" style={{ borderCollapse: 'collapse' }}>
+                        <table className="table mt-4 prod-table" style={{ borderCollapse: 'collapse' }}>
                           <thead>
                             <tr className="text-secondary text-center">
                               <th className="border-none">Name</th>
@@ -288,9 +443,9 @@ const Cart = () => {
                             {cartItems.map(item => (
                               <tr key={item.productId} className="">
                                 <td className="border-none">
-                                  <div className=" ls-1">
-                                    <img src="../../../assets/BP-Tablet.png" alt="img" width="70" height="70" />
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                  <div className=" ls-1 ">
+                                    {/* <img src="../../../assets/BP-Tablet.png" alt="img" width="70" height="70" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp; */}
                                     {item.productName}
                                   </div>
                                 </td>
@@ -303,23 +458,23 @@ const Cart = () => {
                                   <div className="input-group d-flex justify-content-center">
                                     <span className="input-group-btn">
                                       {/* <button type="button" onClick={() => decreaseQuantity(item.productId)} className="quantity-left-minus btn btn-danger btn-number text-center" data-type="minus" data-field=""> */}
-                                        <FontAwesomeIcon size='1x' icon={faSquareMinus} className='cart-minus-icon'  transform=" down-5 left-5" onClick={() => decreaseQuantity(item.productId)}/>
+                                      <FontAwesomeIcon size='1x' icon={faSquareMinus} className='cart-minus-icon' transform=" down-5 left-5" onClick={() => decreaseQuantity(item.productId)} />
                                       {/* </button> */}
                                     </span>
-                                    <input type="text" id="quantity" disabled value={item.quantity} name="quantity" className="text-center" style={{ width: '40px', borderRadius: '10px', borderColor:'darkgrey' }} min="1" />
+                                    <input type="text" id="quantity" disabled value={item.quantity} name="quantity" className="text-center" style={{ width: '40px', borderRadius: '10px', borderColor: 'darkgrey' }} min="1" />
                                     <span className="input-group-btn">
                                       {/* <button type="button" onClick={() => increaseQuantity(item.productId)} className="quantity-right-plus btn btn-success btn-number" data-type="plus" data-field=""> */}
-                                        <FontAwesomeIcon size='1x' icon={faSquarePlus} className='cart-plus-icon' onClick={() => increaseQuantity(item.productId)} color='green' transform=" down-5 right-5"/>
+                                      <FontAwesomeIcon size='1x' icon={faSquarePlus} className='cart-plus-icon' onClick={() => increaseQuantity(item.productId)} color='green' transform=" down-5 right-5" />
                                       {/* </button> */}
                                     </span>
                                   </div>
                                 </td>
 
-                                <td className="text-center" style={{borderRadius: '5px'}}>
-                                  <div style={{borderRadius: '5px'}}>{(item.price * item.quantity).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</div>
+                                <td className="text-center" style={{ borderRadius: '5px' }}>
+                                  <div style={{ borderRadius: '5px' }}>{(item.price * item.quantity).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</div>
                                 </td>
                                 <td className="border-none cursor-pointer">
-                                  <FontAwesomeIcon  color='red' icon={faTrashCan} onClick={() => removeItemFromCart(item.productId)} />
+                                  <FontAwesomeIcon color='red' icon={faTrashCan} onClick={() => removeItemFromCart(item.productId)} />
                                   {/* <button type='button' onClick={() => removeItemFromCart(item.productId)}>
                              Remove
                             </button> */}
@@ -328,17 +483,19 @@ const Cart = () => {
                             ))}
                           </tbody>
                         </table>
-                        <div className='totalprice-div'>Total Price : <span style={{fontWeight: '500',marginLeft: '30px'}}>{itemsPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></div>
+                        <div className='totalprice-div'>Total Price : <span style={{ fontWeight: '500', marginLeft: '30px' }}>{itemsPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</span></div>
                       </div>
-                      <div className="row my-4">
+                      {/* <div className="row my-1">
                         <div className="col-6">
-                            
+
                         </div>
                         <div className="col-6">
 
                         </div>
-                      </div>
-                      <div className="row p-2 pt-4 mb-5 bg-white">
+                      </div> */}
+
+
+                      <div className="customer-container" >
                         <div className="fs-5 mb-3">
                           <FontAwesomeIcon icon={faCircleUser} />
                           <span> Customer Information</span>
@@ -346,49 +503,167 @@ const Cart = () => {
 
 
 
-                        <div className="row mb-4 w-100  justify-content-between m-auto">
-                          <div className="form-group col-6 p-0 pe-2">
-                            <div className="mt-2 mb-1">Full Name</div>
-                            <input type="text" id="billingName" name="billingName" placeholder="Full Name"
-                               value={billingForm.billingName} className="w-100 p-2 bg-grey" onChange={handleChange} />
-                            <div>
-                              {/* *ngIf="billingForm.controls['billingName'].invalid && (billingForm.controls['billingName'].dirty || billingForm.controls['billingName'].touched)"
-                            class="invalid-feedback mb-3">
-                            Customer Name is required */}
-                              {/* -------need to write error msg here-------- */}
-                            </div>
-
+                        {/* <div className="row mb-4 justify-content-between m-auto" >
+                          <div className="mt-2 mb-1">Full Name</div>
+                          <input type="text" id="billingName" name="billingName" placeholder="Full Name"
+                            value={billingForm.billingName} className="w-100 p-2 bg-grey" onChange={handleChange} />
+                          <div>
                           </div>
 
-                          <div className="form-group col-6 p-0">
-                            <div className="mt-2 mb-1">Phone Number</div>
-                            <input type="text" id="billingPhNumber" name="billingPhNumber" placeholder="Phone Number"
-                               value={billingForm.billingPhNumber} className="w-100 p-2 bg-grey" onChange={handleChange}/>
-                            <div>
-                              {/* *ngIf="billingForm.controls['billingPhNumber'].invalid && (billingForm.controls['billingPhNumber'].dirty || billingForm.controls['billingPhNumber'].touched)"
-                              class="invalid-feedback mb-3">
-                              <div /> *ngIf="billingForm.controls['billingPhNumber'].errors?.['required']">Last Name is required. */}
-                              {/* -------need to write error msg here-------- */}
-                            </div>
-                          </div>
+
+                          <div className="mt-2 mb-1">Phone Number</div>
+                          <input type="text" id="billingPhNumber" name="billingPhNumber" placeholder="Phone Number"
+                            value={billingForm.billingPhNumber} className="w-100 p-2 bg-grey" onChange={handleChange} />
+                          <div>              </div>
                         </div>
 
                         <div className="form-group mb-2">
                           <div className="mt-2 mb-1">Address</div>
                           <input type="text" id="billingAddress" name="billingAddress" placeholder="Address"
-                            value={billingForm.billingAddress} className="w-100 p-2 bg-grey" onChange={handleChange}/>
+                            value={billingForm.billingAddress} className="w-100 p-2 bg-grey" onChange={handleChange} />
                           <div className="invalid-feedback" >
-                            {/* *ngIf="billingForm.controls['billingAddress'].invalid && (billingForm.controls['billingAddress'].dirty || billingForm.controls['billingAddress'].touched)"
-                              class="invalid-feedback ">
-                            <div /> *ngIf="billingForm.controls['billingAddress'].errors?.['required']">Last Name is required.</></div>
-                              </> */}
+                            </div>
+                        </div> */}
 
-                          </div>
+
+                        <div>
+                          {editMode ? (
+                            <div>
+                              <div className='row form-group'>
+                                <label>
+                                  Full name:*
+                                  <input type="text" name="billingName" style={{marginTop: '2px'}} placeholder='Enter you Full name' value={billingData.billingName} onChange={handleInputChange} />
+                                  {errors.billingName && <div style={{color: 'red', fontSize: 13}}>{errors.billingName}</div>}
+                                </label>
+                              </div>
+                              <div className='row form-group'>
+                                <label>
+                                  Phone Number:*
+                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} onChange={handleInputChange} />
+                                  {errors.billingPhNumber && <div style={{color: 'red', fontSize: 13}}>{errors.billingPhNumber}</div>}
+                                </label>
+                              </div>
+
+                              <div className='row form-group' style={{marginLeft: '0px', fontSize: 24, fontWeight: 400, marginTop: '-15px', color: 'rgb(241 104 92)', textDecoration: 'underline'}}>Address</div>
+                              
+                              <div className='row form-group'>
+                                <div className='col-sm-6' >
+                                  <label>
+                                    Address Line:*
+                                    <input type="text" name="addressLine" style={{marginTop: '2px'}} placeholder='Enter your address line' value={billingData.addressLine} onChange={handleInputChange} />
+                                    {errors.addressLine && <div style={{color: 'red', fontSize: 13}}>{errors.addressLine}</div>}
+                                  </label>
+                                </div>
+                                <div className='col-6'>
+                                  <label>
+                                    Street:*
+                                    <input type="text" name="street" style={{marginTop: '2px'}} placeholder='Enter your street' value={billingData.street} onChange={handleInputChange} />
+                                    {errors.street && <div style={{color: 'red', fontSize: 13}}>{errors.street}</div>}
+                                  </label>
+                                </div>
+                              </div>
+                              <div className='row form-group'>
+                                <div className='col-6'>
+                                  <label>
+                                    City:*
+                                    <input type='text' name='city' style={{marginTop: '2px'}} placeholder='Enter your city' value={billingData.city} onChange={handleInputChange} />
+                                    {errors.city && <div style={{color: 'red', fontSize: 13}}> {errors.city}</div>}
+                                  </label>
+                                </div>
+                              
+                              <div className='col-6'>
+                                  <label>
+                                    State:*
+                                    <input type="text" name="state" style={{marginTop: '2px'}} placeholder='Enter your state' value={billingData.state} onChange={handleInputChange} />
+                                    {errors.state && <div style={{color: 'red', fontSize: 13}}>{errors.state}</div>}
+                                  </label>
+                                  </div>
+                                  </div>
+                                    <div className='row form-group'>
+                                      <div className='col-6'>
+                                    <label>
+                                      Pincode:*
+                                      <input type="text" name="pincode" style={{marginTop: '2px'}} placeholder='Enter your pincode' value={billingData.pincode} onChange={handleInputChange} />
+                                      {errors.pincode && <div style={{color: 'red', fontSize: 13}}>{errors.pincode}</div>}
+                                    </label>
+                                    </div>
+                                    <div className='col-6'></div>
+                              </div>
+                              <button type='button' className='w-60 btn proceed-to-order px-5 py-2' onClick={handleSubmit}>Place order</button>
+                            </div>
+
+                          ) : (
+                            <div>
+                              <div className='row form-group'>
+                                <label>
+                                  Full name:*
+                                  <input type="text" name="billingName" style={{marginTop: '2px'}} placeholder='Enter you Full name' value={billingData.billingName} onChange={handleInputChange} />
+                                  {errors.billingName && <div style={{color: 'red', fontSize: 13}}>{errors.billingName}</div>}
+                                </label>
+                              </div>
+                              <div className='row form-group'>
+                                <label>
+                                  Phone Number:*
+                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} onChange={handleInputChange} />
+                                  {errors.billingPhNumber && <div style={{color: 'red', fontSize: 13}}>{errors.billingPhNumber}</div>}
+                                </label>
+                              </div>
+                              <span className='form-group' style={{marginLeft: '0px', fontSize: 24, fontWeight: 400, marginTop: '-15px', color: 'rgb(241 104 92)', textDecoration: 'underline'}}>Address <FontAwesomeIcon icon={faPenToSquare} style={{marginLeft: '5px'}} className='address-edit-icon' onClick={handleEditToggle}/></span>
+                              
+                              <div className='row form-group' style={{marginTop: '15px'}}>
+                                <div className='col-sm-6' >
+                                  <label>
+                                    Address Line:*
+                                    <input type="text" name="addressLine" style={{marginTop: '2px'}} placeholder='Enter your address line' value={billingData.addressLine} onChange={handleInputChange} disabled/>
+                                    {errors.addressLine && <div style={{color: 'red', fontSize: 13}}>{errors.addressLine}</div>}
+                                  </label>
+                                </div>
+                                <div className='col-6'>
+                                  <label>
+                                    Street:*
+                                    <input type="text" name="street" style={{marginTop: '2px'}} placeholder='Enter your street' value={billingData.street} onChange={handleInputChange} disabled/>
+                                    {errors.street && <div style={{color: 'red', fontSize: 13}}>{errors.street}</div>}
+                                  </label>
+                                </div>
+                              </div>
+                              <div className='row form-group'>
+                                <div className='col-6'>
+                                  <label>
+                                    City:*
+                                    <input type='text' name='city' style={{marginTop: '2px'}} placeholder='Enter your city' value={billingData.city} onChange={handleInputChange} disabled/>
+                                    {errors.city && <div style={{color: 'red', fontSize: 13}}> {errors.city}</div>}
+                                  </label>
+                                </div>
+                              
+                              <div className='col-6'>
+                                  <label>
+                                    State:*
+                                    <input type="text" name="state" style={{marginTop: '2px'}} placeholder='Enter your state' value={billingData.state} onChange={handleInputChange} disabled/>
+                                    {errors.state && <div style={{color: 'red', fontSize: 13}}>{errors.state}</div>}
+                                  </label>
+                                  </div>
+                                  </div>
+                                  <div className='row form-group'>
+                                      <div className='col-6'>
+                                    <label>
+                                      Pincode:*
+                                      <input type="text" name="pincode" style={{marginTop: '2px'}} placeholder='Enter your pincode' value={billingData.pincode} onChange={handleInputChange} disabled />
+                                      {errors.pincode && <div style={{color: 'red', fontSize: 13}}>{errors.pincode}</div>}
+                                    </label>
+                                    </div>
+                                    <div className='col-6'></div>
+                              </div>
+                              {/* <button type='button' className='address-edit-button w-40 btn' onClick={handleEditToggle}>Edit</button> */}
+                            </div>
+                          )
+                          }
+                        </div >
+                        {!editMode &&
+                        <button type='button' className='w-60 btn proceed-to-order px-5 py-2'  onClick={handleSubmit}>Place order</button>
+                        }
                         </div>
-                        <button type='button' className='w-100 btn btn-success px-5 py-2' onClick={handleSubmit}>Proceed to order</button>
-                        </div>
-                      </div>
-                    </div >
+                    </div>
+                  </div >
                 </form >
               </div >
 
@@ -396,7 +671,8 @@ const Cart = () => {
           </>)
         }
       </div >
-    </div >
+      
+    </div>
 
   )
 }

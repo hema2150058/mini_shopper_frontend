@@ -49,5 +49,6 @@ export async function uploadExcel(file) {
 }
 
 export async function placeOrder(billingDetails) {
+    console.log(billingDetails);
     return await axios.post('http://localhost:8082/placeOrder', billingDetails, config);
 }
