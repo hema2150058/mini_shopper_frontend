@@ -8,6 +8,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import './Products.css';
+import { useNavigate } from 'react-router-dom';
 
 const Products = () => {
 
@@ -15,6 +16,7 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   let userId = localStorage.getItem('userName');
+  const navigate = useNavigate();
   const [cartSize, setCartSize] = useState(0);
 
   useEffect(() => {
@@ -231,11 +233,8 @@ const Products = () => {
     setFile(event.target.files[0])
   }
   async function handleSubmit(event) {
-    if (event.preventDefault() === undefined) {
-      alert('Please choose a file before uploading.')
-    } else {
+    
       event.preventDefault()
-      //const url = 'http://localhost:3000/uploadFile';
       const formData = new FormData();
       formData.append('file', file);
       formData.append('fileName', file.name);
@@ -250,13 +249,16 @@ const Products = () => {
 
           console.log(response.data);
           localStorage.setItem('orderNumber', response.data);
+          console.log(response.data);
           alert('File uploaded successfully and ' + response.data);
           event = '';
+          
+          navigate('/checkout');
         })
         .catch(error => {
           alert('Error uploading file', error);
         })
-    }
+    
   };
 
   
@@ -302,7 +304,7 @@ const Products = () => {
           <div className="col-3">
             <form  onSubmit={handleSubmit} id='upload-form-group'>
               {/* //<h1>React File Upload</h1> */}
-              <input type="file" accept=".xl*" onChange={handleChange} />
+              <input type="file" accept=".xl*" onChange={(e) => handleChange(e)} />
               <span><button className='upload-button' type="submit">Upload</button></span>
             </form>
           </div>

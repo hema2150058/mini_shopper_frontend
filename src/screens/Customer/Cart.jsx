@@ -321,7 +321,7 @@ const Cart = () => {
       await placeOrder({ billingName: billName, billingphoneNum: billPhno, billingAddress: formattedAddress, userId: userId, }).then((res) => {
         console.log(res.data);
         localStorage.setItem('orderNumber',res.data.orderNumber);
-        navigate('/purchaseHistory');
+        navigate('/checkout');
       })
       // Implement your order placement logic here using axios.post or any other method
     } catch (error) {

@@ -85,12 +85,15 @@ const Login = () => {
                 <form onSubmit={handleLogin} className='login-form-container'>
                     <div className='form-group'>
                         <label className='login-label'>Email</label>
+                        <div>
                         <input type='text' id='email' name='email' value={email} className='login-input'
                             placeholder='Enter your email' onChange={e => setEmail(e.target.value)}
                         />
                         {emailError ? <p>{emailError}</p> : null}
+                        </div>
                         {/* will be a error msg here */}
                     </div>
+                    
                     <div className='form-group'>
                         <label className='login-label'>Password</label>
                         <div className='password-input'>
@@ -98,13 +101,13 @@ const Login = () => {
                                 id='password' name='password' value={password}
                                 placeholder='Enter your password' onChange={e => setPassword(e.target.value)}
                             />
-                            <span className='toggleicon' onClick={togglePasswordVisibility}>{showPassword ? <FontAwesomeIcon icon={faEye} color='grey' /> : <FontAwesomeIcon icon={faEyeSlash} color='grey' />}</span>
+                            <span className='toggleicon' onClick={togglePasswordVisibility}>{showPassword ? <FontAwesomeIcon icon={faEye} color='grey' transform='down-3'/> : <FontAwesomeIcon icon={faEyeSlash} color='grey' transform='down-3'/>}</span>
                             {passwordError ? <p>{passwordError}</p> : null}
                         </div>
                     </div>
                     <button type='submit' className='login-button'>Login</button>
                     <div className='signup-container'>
-                        <p style={{ display: 'inline', marginBottom: '1rem', marginLeft: '28px', padding: '20px', paddingRight: '10px' }}>New User ? </p>
+                        <p style={{ display: 'inline', marginBottom: '1rem', marginLeft: '25px', padding: '20px', paddingRight: '10px', fontFamily: 'Catamaran', fontWeight: '500' }}>New User ?</p>
                         <button type='button' className='signup-button' onClick={handleRegister}>Sign up</button>
 
                     </div>

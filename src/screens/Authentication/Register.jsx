@@ -152,7 +152,7 @@ return (
             </div>
           </Col>
         </Row>
-        <h4 style={{ marginBottom: '15px', textDecoration: 'underline', color: 'orangered' }}>Address</h4>
+        <h4 style={{ marginBottom: '15px', textDecoration: 'underline', color: 'orangered',  fontFamily: 'Catamaran' }}>Address</h4>
         <Row>
           <Col>
             <div className='form-group'>
@@ -213,7 +213,7 @@ return (
 
         <button type='submit' className='register-button'>Register</button>
         <div className='signin-container'>
-          <p style={{ display: 'inline', marginBottom: '1rem', marginLeft: '28px', padding: '20px', paddingRight: '10px' }}>Already have an account ? </p>
+          <p style={{ display: 'inline', marginBottom: '1rem', marginLeft: '28px', padding: '20px', paddingRight: '10px', fontFamily: 'Catamaran' }}>Already have an account ? </p>
           <button type='button' className='signin-button' onClick={handleLogin1}>Sign In</button>
         </div>
       </form>

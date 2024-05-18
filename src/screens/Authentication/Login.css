@@ -139,7 +139,8 @@ left: 220px
     background-color: white;
     color: orangered;
     font-size: large;
-    font-weight: 500;
+    font-weight: 700;
+    font-family: Catamaran;
 }
 .signup-button:active {
     transform: scale(0.98);

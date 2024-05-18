@@ -18,6 +18,7 @@ import AllOrders from './screens/Shopper/AllOrders';
 import PendingOrders from './screens/Shopper/PendingOrders';
 import ProtectedRoute from './ProtectedRoute';
 import AddressForm from './components/Test2';
+import FileUpload from './components/Test4';
 
 
 function App() {
@@ -86,6 +87,7 @@ function App() {
 
         <Route path='authNav' Component={AuthRoute} />
         <Route path='/updateAddress' Component={AddressForm} />
+        <Route path='/fileUpload' Component={FileUpload} />
         {/* <Route path='/admin'  element= {<ProtectedRoute component={AllCustomers}  allowedRoles={[ROLES.ADMIN]} />}  /> */}
       </Routes>
     </Router>
