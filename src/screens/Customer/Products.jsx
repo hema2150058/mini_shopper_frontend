@@ -35,12 +35,12 @@ const Products = () => {
     fetchProducts();
 
     // Fetch cart
-    
+
     fetchCart();
   }, []);
 
   const fetchCart = async () => {
-      
+
     const userId = localStorage.getItem("userName");
     console.log(userId); // Assuming you store userId in localStorage after login
     const response = await getCart(userId);
@@ -50,12 +50,13 @@ const Products = () => {
       console.log(cart);
     }
     console.log(cart);
-};
+  };
 
   function isItemInCart(productId) {
     return cart.some(p => {
       // console.log(p);
-      return p.productId == productId});
+      return p.productId == productId
+    });
   }
 
   const getCartSize = () => {
@@ -100,7 +101,7 @@ const Products = () => {
     try {
       // Check if the item is already in the cart
       const userId = localStorage.getItem("userName");
-      const response = isItemInCart(productId );
+      const response = isItemInCart(productId);
       console.log(response);
       const removeproduct = { "userId": userId, "productId": productId }
       if (response === true) {
@@ -116,7 +117,7 @@ const Products = () => {
             "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH",
           },
         })
-          .then(response => { console.log(response.body);fetchCart(); })
+          .then(response => { console.log(response.body); fetchCart(); })
           .catch(error => {
             console.log(error);
           });
@@ -130,7 +131,7 @@ const Products = () => {
         console.log('added to cart');
         //setInCart(true);
       }
-      
+
       //await fro update cart
     } catch (error) {
       console.error("Error adding/removing item from cart:", error);
@@ -233,35 +234,35 @@ const Products = () => {
     setFile(event.target.files[0])
   }
   async function handleSubmit(event) {
-    
-      event.preventDefault()
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('fileName', file.name);
-      console.log(formData);
-      const config = {
-        headers: {
-          'content-type': 'multipart/form-data',
-        },
-      };
-      await uploadExcel(formData)
-        .then((response) => {
 
-          console.log(response.data);
-          localStorage.setItem('orderNumber', response.data);
-          console.log(response.data);
-          alert('File uploaded successfully and ' + response.data);
-          event = '';
-          
-          navigate('/checkout');
-        })
-        .catch(error => {
-          alert('Error uploading file', error);
-        })
-    
+    event.preventDefault()
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('fileName', file.name);
+    console.log(formData);
+    const config = {
+      headers: {
+        'content-type': 'multipart/form-data',
+      },
+    };
+    await uploadExcel(formData)
+      .then((response) => {
+
+        console.log(response.data);
+        localStorage.setItem('orderNumber', response.data);
+        console.log(response.data);
+        alert('File uploaded successfully and ' + response.data);
+        event = '';
+
+        navigate('/checkout');
+      })
+      .catch(error => {
+        alert('Error uploading file', error);
+      })
+
   };
 
-  
+
 
   return (
     <div style={{ marginTop: '74px' }}>
@@ -302,7 +303,7 @@ const Products = () => {
             </div>
           </div>
           <div className="col-3">
-            <form  onSubmit={handleSubmit} id='upload-form-group'>
+            <form onSubmit={handleSubmit} id='upload-form-group'>
               {/* //<h1>React File Upload</h1> */}
               <input type="file" accept=".xl*" onChange={(e) => handleChange(e)} />
               <span><button className='upload-button' type="submit">Upload</button></span>
@@ -340,29 +341,29 @@ const Products = () => {
                     </h6>
 
 
-                    <div className="card-text h-20 shadow" style={{marginRight: '20px'}}>
+                    <div className="card-text h-20 shadow" style={{ marginRight: '20px' }}>
                       <div className={`btn ${isItemInCart(product.productId) ? "btn-outline-success" : "btn-outline-secondary"
                         } btn-number`} onClick={() => handleAddToCart(product.productId)}>
                         <FontAwesomeIcon size='lg' icon={faCartShopping} />
                       </div>
                     </div>
-                        </div>
-                        </div>
-                  </div>
-                </div>
-          ))}
-              </div>
-              <div className="container">
-                <div className="row">
-                  <div className="col-md-12 text-center">
-                    {products.length === 0 && <p>No Products Found</p>}
                   </div>
                 </div>
               </div>
             </div>
+          ))}
+        </div>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12 text-center">
+              {products.length === 0 && <p>No Products Found</p>}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-        );
+  );
 };
 
 
-        export default Products;
+export default Products;

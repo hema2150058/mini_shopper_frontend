@@ -35,7 +35,7 @@ const ShopperNavHeader = () => {
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav variant='underline' className="header-menu">
                         <Nav.Link href="/pendingOrders"> Home </Nav.Link>
-                        <Nav.Link className='header-menu-item' href="/products">Products</Nav.Link>
+                        <Nav.Link className='header-menu-item' href="/shopperInventory">Products</Nav.Link>
                         <NavDropdown className='header-menu-item' title="Actions">
                             <NavDropdown.Item href="/pendingOrders">Pending Orders</NavDropdown.Item>
                             <NavDropdown.Item href="/allOrders">

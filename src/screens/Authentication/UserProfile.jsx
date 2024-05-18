@@ -1,9 +1,11 @@
 import React from 'react'
+import ShopperNavHeader from '../HeaderFooter/ShopperNavHeader';
 
 const UserProfile = () => {
   return (
-    <div style={{marginTop: '20%'}}>
-      userprofile
+    <div style={{marginTop: '74px'}}>
+      <ShopperNavHeader />
+      userprofile 
     </div>
   )
 }

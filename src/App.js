@@ -19,6 +19,7 @@ import PendingOrders from './screens/Shopper/PendingOrders';
 import ProtectedRoute from './ProtectedRoute';
 import AddressForm from './components/Test2';
 import FileUpload from './components/Test4';
+import ShopperInventory from './screens/Shopper/ShopperInventory';
 
 
 function App() {
@@ -84,6 +85,7 @@ function App() {
         <Route path='/pendingOrders' Component={PendingOrders} />
         <Route path='allCustomers' Component={AllCustomers} />
         <Route path='/allOrders' Component={AllOrders} />
+        <Route path='/shopperInventory' Component={ShopperInventory} />
 
         <Route path='authNav' Component={AuthRoute} />
         <Route path='/updateAddress' Component={AddressForm} />
