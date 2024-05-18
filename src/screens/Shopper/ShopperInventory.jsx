@@ -1,6 +1,6 @@
 import React from 'react'
 
-const HomeShopper = () => {
+const ShopperInventory = () => {
   return (
     <div>
       hi
@@ -8,4 +8,4 @@ const HomeShopper = () => {
   )
 }
 
-export default HomeShopper;
+export default ShopperInventory;
