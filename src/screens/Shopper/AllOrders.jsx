@@ -25,6 +25,8 @@ Modal.setAppElement('#root');
 const AllOrders = () => {
 
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalIsOpen, setIsOpen] = useState(false);
 
@@ -35,16 +37,34 @@ const AllOrders = () => {
         if (response.status === 200) {
           console.log(response.data);
           setOrders(response.data);
+          setFilteredOrders(response.data);
         }
       }
       catch (error) {
-        console.log('Error fetching the all order history: ', error);
+        console.log('Error fetching the order history: ', error);
       }
     }
     fetchAllUserOrder();
   }, [])
 
   console.log(orders);
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterOrders(query);
+};
+
+const filterOrders = (query) => {
+  const filtered = orders.filter(order =>
+      order.orderNumber.toString().includes(query) ||
+      order.orderDate.includes(query) ||
+      order.customerName.toLowerCase().includes(query.toLowerCase()) ||
+      order.totalPrice.toString().includes(query) ||
+      order.orderStatus.toLowerCase().includes(query.toLowerCase())
+  );
+  setFilteredOrders(filtered);
+};
 
   const openModal = (order) => {
     setSelectedOrder(order);
@@ -65,7 +85,7 @@ const AllOrders = () => {
           <div className="form-group has-search" >
             <span className="material-icons form-control-feedback"></span>
             <FontAwesomeIcon className='search-icon' color='silver' icon={faMagnifyingGlass} />
-            <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" />
+            <input type="text" value={searchQuery} onChange={handleSearchChange} className="form-control rounded-pill bg-grey" placeholder="Search" />
           </div>
         </div>
         <div className="history-container mt-5">
@@ -74,12 +94,13 @@ const AllOrders = () => {
               <tr>
                 <th>Order Number</th>
                 <th>Order Date</th>
+                <th>Customer Name</th>
                 <th>Total Price</th>
                 <th>Order Status</th>
               </tr>
             </thead>
             <tbody className='history-table-body'>
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.orderNumber}>
                   <td>
                     <button type='button' className="btn popclick" onClick={() => openModal(order)}>
@@ -87,6 +108,7 @@ const AllOrders = () => {
                     </button>
                   </td>
                   <td>{order.orderDate}</td>
+                  <td>{order.customerName}</td>
                   <td>{(order.totalPrice).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                   <td>{order.orderStatus}</td>
                 </tr>

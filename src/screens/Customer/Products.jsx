@@ -326,10 +326,10 @@ const Products = () => {
                   )} */}
 
                 </div>
-                <div className="card-title-productname text-green font-weight-bold ">
+                <div className="card-title-productname font-weight-bold ">
                   {product.productName}
                 </div>
-                <div className="card-title-proddesc text-green font-weight-bold mt-1">
+                <div className="card-title-proddesc  font-weight-bold mt-1">
                   {product.productDesc}
                 </div>
                 <div className="card-body">

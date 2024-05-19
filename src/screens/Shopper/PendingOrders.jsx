@@ -25,8 +25,11 @@ Modal.setAppElement('#root');
 
 const PendingOrders = () => {
 
+  
   const navigate = useNavigate();
   const [pendingOrders, setPendingOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -38,6 +41,7 @@ const PendingOrders = () => {
         if (response.status === 200) {
           console.log(response.data);
           setPendingOrders(response.data);
+          setFilteredOrders(response.data);
           setLoading(false);
         }
       }
@@ -50,6 +54,23 @@ const PendingOrders = () => {
   }, [])
 
   console.log(pendingOrders);
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterOrders(query);
+};
+
+const filterOrders = (query) => {
+  const filtered = pendingOrders.filter(order =>
+      order.orderNumber.toString().includes(query) ||
+      order.orderDate.includes(query) ||
+      order.customerName.toLowerCase().includes(query.toLowerCase()) ||
+      order.totalPrice.toString().includes(query) ||
+      order.orderStatus.toLowerCase().includes(query.toLowerCase())
+  );
+  setFilteredOrders(filtered);
+};
 
   const handleStatusChange = (orderNumber, newStatus) => {
     const apiMap = {
@@ -69,6 +90,7 @@ const PendingOrders = () => {
           setPendingOrders(pendingOrders.map(order =>
             order.orderNumber === orderNumber ? { ...order, orderStatus: newStatus } : order
           ));
+          window.location.reload();
         })
         .catch(error => {
           console.error(`There was an error updating the order status to ${newStatus}!`, error);
@@ -116,7 +138,7 @@ const PendingOrders = () => {
           <div className="form-group has-search" >
             <span className="material-icons form-control-feedback"></span>
             <FontAwesomeIcon className='search-icon' color='silver' icon={faMagnifyingGlass} />
-            <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" />
+            <input type="text" value={searchQuery} onChange={handleSearchChange}  className="form-control rounded-pill bg-grey" placeholder="Search" />
           </div>
         </div>
         <div className="history-container mt-5">
@@ -125,12 +147,13 @@ const PendingOrders = () => {
               <tr>
                 <th>Order Number</th>
                 <th>Order Date</th>
+                <th>Customer Name</th>
                 <th>Total Price</th>
                 <th>Order Status</th>
               </tr>
             </thead>
             <tbody className='history-table-body'>
-              {pendingOrders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.orderNumber}>
                   <td>
                     <button type='button' className="btn popclick" onClick={() => openModal(order)}>
@@ -138,12 +161,14 @@ const PendingOrders = () => {
                     </button>
                   </td>
                   <td>{order.orderDate}</td>
+                  <td>{order.customerName}</td>
                   <td>{(order.totalPrice).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                   <td>
-                    <select
+                    <select style={{textAlign: 'center'}}
                       value={order.orderStatus}
                       onChange={(e) => handleStatusChange(order.orderNumber, e.target.value)}
                     >
+                      <option>Pending</option>
                       <option value="Reject">Reject</option>
                       <option value="Accept">Accept</option>
                       <option value="Send to Review">Send to Review</option>
