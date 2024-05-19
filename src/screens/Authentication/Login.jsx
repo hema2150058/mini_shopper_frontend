@@ -51,7 +51,11 @@ const Login = () => {
                     localStorage.setItem('token',response.jwtAuthToken);
                     alert('Login Success');
                     console.log('naviagte to products');
+                    if(localStorage.getItem('userName') === 'Shopper123'){
+                        navigate('/pendingOrders');
+                    }else{
                     navigate('/products');
+                    }
                 })
                 .catch(error => {
                     if (error.response) {
