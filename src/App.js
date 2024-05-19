@@ -20,6 +20,7 @@ import ProtectedRoute from './ProtectedRoute';
 import AddressForm from './components/Test2';
 import FileUpload from './components/Test4';
 import ShopperInventory from './screens/Shopper/ShopperInventory';
+import Footer from './screens/HeaderFooter/Footer';
 
 
 function App() {
@@ -73,14 +74,14 @@ function App() {
         <Route path='userprofile' Component={UserProfile} />
         
         {/* ----------customers---------- */}
-        <Route path='/customerNavHeader' Component={CustomerNavHeader} />
+        {/* <Route path='/customerNavHeader' Component={CustomerNavHeader} /> */}
         <Route path='/products' Component={Products} />
         <Route path='/checkout' Component={Checkout} />
         <Route path='/purchaseHistory' Component={PurchaseHistory} />
         <Route path='/cart' Component={Cart} />
 
         {/* -------------Shopper------------ */}
-        <Route path='/shopperNavHeader' Component={ShopperNavHeader} />
+        {/* <Route path='/shopperNavHeader' Component={ShopperNavHeader} /> */}
             {/* --products-- also gonna be added */}
         <Route path='/pendingOrders' Component={PendingOrders} />
         <Route path='allCustomers' Component={AllCustomers} />
@@ -88,6 +89,7 @@ function App() {
         <Route path='/shopperInventory' Component={ShopperInventory} />
 
         <Route path='authNav' Component={AuthRoute} />
+        <Route path='footer' Component={Footer} />
         <Route path='/updateAddress' Component={AddressForm} />
         <Route path='/fileUpload' Component={FileUpload} />
         {/* <Route path='/admin'  element= {<ProtectedRoute component={AllCustomers}  allowedRoles={[ROLES.ADMIN]} />}  /> */}

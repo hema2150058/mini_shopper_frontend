@@ -1,0 +1,29 @@
+.footer-logo {
+    width: 150px;
+    height: 80px;
+    margin-top: 10px;
+    margin-left: 40px;
+    margin-bottom: 30px;
+}
+
+.footer-select {
+    margin-left: 100px;
+    margin-top: 20px;
+    background-color: #45526e;
+    border: none;
+    color: white;
+}
+
+.subscribe-button {
+    margin-left: 20px;
+    border: none;
+    background-color: #ed4747de;
+    color: white;
+    width: 100px;
+    height: 35px;
+    border-radius: 8px;
+}
+
+a{
+    text-decoration: none;
+}
