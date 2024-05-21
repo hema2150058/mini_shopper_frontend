@@ -63,6 +63,7 @@
 
  .cart-icon:hover {
   color: #FF786CFF;
+  cursor: pointer;
  }
 
  .cart-icon:active {

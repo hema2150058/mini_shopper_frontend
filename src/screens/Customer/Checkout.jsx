@@ -88,7 +88,7 @@ const Checkout = () => {
 
               {orderItems.map((orderItem, index) => (
                 <div key={index} className="d-flex align-items-center px-4 justify-content-between mb-2">
-                  <img src={require('../../assets/shoe2-img.jpg')} alt="product-image" width="80" height="70" />
+                  <img src={orderItem.imageUrl} alt="product-image" width="60" height="70" style={{marginRight: '10px'}} />
                   <div className="ms-2 text-start d-flex flex-column">
                     <div>{orderItem.productName}</div>
                   </div>

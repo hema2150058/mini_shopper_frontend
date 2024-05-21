@@ -9,11 +9,10 @@ import ShopperNavHeader from '../HeaderFooter/ShopperNavHeader';
 const ShopperInventory = () => {
 
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   let userId = localStorage.getItem('userName');
-  const navigate = useNavigate();
-  const [cartSize, setCartSize] = useState(0);
 
   useEffect(() => {
     // Fetch products
@@ -23,6 +22,7 @@ const ShopperInventory = () => {
         if (response.status === 200) {
           console.log('got the products data');
           setProducts(response.data);
+          setFilteredProducts(response.data);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -51,6 +51,23 @@ const ShopperInventory = () => {
       return p.productId == productId
     });
   }
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterProducts(query);
+};
+
+const filterProducts = (query) => {
+  const filtered = products.filter(product =>
+    product.price.toString().includes(query) ||
+    //product.orderDate.includes(query) ||
+    product.productName.toLowerCase().includes(query.toLowerCase()) ||
+    // product.totalPrice.toString().includes(query) ||
+    product.productDesc.toLowerCase().includes(query.toLowerCase())
+  );
+  setFilteredProducts(filtered);
+};
 
   const orderByAsc = () => {
     setProducts([...products.sort((a, b) => ((a.price) - (b.price)))]);
@@ -121,7 +138,7 @@ const ShopperInventory = () => {
           <div className="col-4 ">
             <div className="form-group has-search">
               <span className="material-icons form-control-feedback"></span>
-              <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" value={filteredProducts} onChange={(e) => setFilteredProducts(e.target.value)} />
+              <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" value={searchQuery} onChange={handleSearchChange} />
             </div>
           </div>
           {/* Sort Dropdown */}
@@ -139,7 +156,7 @@ const ShopperInventory = () => {
       {/* ---------------products----------------   */}
       <div className="container">
         <div className="row">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div className="col-3 mb-5" key={product.productId}>
               <div className="card h-80   shadow">
                 <div className="img-background card-header px-3 pt-4 pb-2 bg-white border-0">

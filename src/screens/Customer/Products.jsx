@@ -13,11 +13,11 @@ import { useNavigate } from 'react-router-dom';
 const Products = () => {
 
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   let userId = localStorage.getItem('userName');
   const navigate = useNavigate();
-  const [cartSize, setCartSize] = useState(0);
 
   useEffect(() => {
     // Fetch products
@@ -27,6 +27,7 @@ const Products = () => {
         if (response.status === 200) {
           console.log('got the products data');
           setProducts(response.data);
+          setFilteredProducts(response.data);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -42,7 +43,7 @@ const Products = () => {
   const fetchCart = async () => {
 
     const userId = localStorage.getItem("userName");
-    console.log(userId); // Assuming you store userId in localStorage after login
+    console.log(userId); 
     const response = await getCart(userId);
     console.log('getting the cart');
     if (response.status === 200) {
@@ -59,11 +60,21 @@ const Products = () => {
     });
   }
 
-  const getCartSize = () => {
-    console.log(cart.length);
-    //setCartSize(cartSize);
-    //console.log(cartSize);
-    return cart.length;
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    filterProducts(query);
+};
+
+  const filterProducts = (query) => {
+    const filtered = products.filter(product =>
+      product.price.toString().includes(query) ||
+      //product.orderDate.includes(query) ||
+      product.productName.toLowerCase().includes(query.toLowerCase()) ||
+      // product.totalPrice.toString().includes(query) ||
+      product.productDesc.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredProducts(filtered);
   };
 
   const orderByAsc = () => {
@@ -73,29 +84,6 @@ const Products = () => {
   const orderByDesc = () => {
     setProducts([...products.sort((a, b) => ((b.price) - (a.price)))]);
   };
-
-  async function AddToCart(productId) {
-    try {
-      const userId = localStorage.getItem("userName");
-      console.log(productId);
-      const response = await addToCart({ userId, productId, quantity: 1 });
-
-      if (response.status === 201) {
-        console.log('add to cart data', response);
-        setCart([...cart, response.data]);
-      }
-    } catch (error) {
-      console.error('error adding to cart:', error);
-    }
-
-  };
-
-  const getItemQty = (productId) => cart.find((p) => p.productId === productId)?.quantity || 0;
-
-  //const isItemInCart = (productId) => cart.some((p) => p.productId === productId);
-
-
-  //const [inCart, setInCart] = useState(false);
 
   async function handleAddToCart(productId) {
     try {
@@ -124,8 +112,6 @@ const Products = () => {
         //setInCart(false);
       }
       else {
-        // Item is already in the cart, so remove it
-        // Item is not in the cart, so add it
         await addToCart({ userId, productId, quantity: 1 });
         fetchCart();
         console.log('added to cart');
@@ -137,94 +123,6 @@ const Products = () => {
       console.error("Error adding/removing item from cart:", error);
     }
   };
-
-  // async function handledeleteToCart(productId) {
-  //   try {
-  //   const userId = localStorage.getItem("userName");
-  //     const response = await IsitemInCart({userId, productId });
-  //     const removeproduct = { "userId": userId, "productId" : productId}
-  //     if(response.data === true) {
-  //       console.log('inside the deletehandle');
-  //       fetch('http://localhost:8082/removeFromCart',{
-  //         method: "DELETE",
-  //         body: JSON.stringify(removeproduct)
-  //         ,
-  //         headers: {
-  //             "Content-Type": "application/json",
-  //             'Accept': 'application/json',
-  //             "Access-Control-Allow-Origin": "*",
-  //       "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH",
-  //         },
-  //     })
-  //       .then(response => {console.log(response.body)})
-  //       .catch(error => {
-  //         console.log(error);
-  //       });
-  //       setInCart(false);
-  //     }
-  // }catch (error){
-  //   console.error('error deleting from handledelete', error);
-  // }
-  // }
-  // async function isItempresent() {
-  //   const response = await
-  // }
-
-  // const increaseQuantity = async (productId) => {
-  //   try {
-  //     const userId = localStorage.getItem('userName');
-  //     const quantity = cart.find((p) => p.productId === productId)?.quantity + 1 || 1;
-  //     await updateCart({ userId, productId, quantity }).then((res) => {
-  //       if (res.status === 200) {
-  //         // cart.find(p=>p.productId==productId).quantity=quantity;
-  //         // console.log(cart);
-  //         const updatedCart = cart.map(item =>
-  //           item.productId === productId ? { ...item, quantity } : item);
-
-  //         setCart(updatedCart);
-  //       }
-  //     })
-  //   } catch (error) {
-  //     console.error('enter updating quantity(increase quantity):', error);
-
-  //   };
-  // };
-
-  // const decreaseQuantity = async (productId) => {
-  //   try {
-  //     const userId = localStorage.getItem('userName');
-  //     let quantity = cart.find((p) => p.productId === productId)?.quantity;
-  //     if (quantity > 1) {
-  //       quantity -= 1;
-  //     } else {
-  //       removeProductFromCart(productId, userId);
-  //       return;
-  //     }
-  //     await updateCart({ userId, productId, quantity }).then((res) => {
-
-  //       if (res.status === 200) {
-  //         const updatedCart = cart.map(item =>
-  //           item.productId === productId ? { ...item, quantity } : item);
-  //         setCart(updatedCart);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error("error updating quantity(decrease quantity)", error);
-  //   };
-  // }
-  // const removeProductFromCart = async (productId, userId) => {
-  //   try {
-  //     await removeFromCart({ userId, productId }).then((res) => {
-  //       if (res.status === 200) {
-  //         const updatedCart = cart.filter((p) => p.productId !== productId);
-  //         setCart(updatedCart);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error('error updating quantity', error);
-  //   };
-  // }
-
 
   // ------------------------file upload-----------------
 
@@ -289,7 +187,7 @@ const Products = () => {
           <div className="col-4 ">
             <div className="form-group has-search">
               <span className="material-icons form-control-feedback"></span>
-              <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" value={filteredProducts} onChange={(e) => setFilteredProducts(e.target.value)} />
+              <input type="text" className="form-control rounded-pill bg-grey" placeholder="Search" value={searchQuery} onChange={handleSearchChange} />
             </div>
           </div>
           {/* Sort Dropdown */}
@@ -314,7 +212,7 @@ const Products = () => {
       {/* -----products-- */}
       <div className="container">
         <div className="row">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <div className="col-3 mb-5" key={product.productId}>
               <div className="card h-80   shadow">
                 <div className="img-background card-header px-3 pt-4 pb-2 bg-white border-0">

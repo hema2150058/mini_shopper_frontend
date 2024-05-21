@@ -259,6 +259,9 @@ const Cart = () => {
     };
   };
 
+  const [isError, setIsError] = useState(false);
+    const pattern = new RegExp(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAddressData(prevData => ({
@@ -539,7 +542,11 @@ const Cart = () => {
                               <div className='row form-group'>
                                 <label>
                                   Phone Number:*
-                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} onChange={handleInputChange} />
+                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} 
+                                   onChange={(e) => {handleInputChange(e);
+                                    if(!pattern.test(e.target.value)) setIsError(true); 
+                                    else setIsError(false)}} />
+                                    {isError? <div style={{color: 'red', fontSize: 13}}>Invalid phone number</div>: ''} 
                                   {errors.billingPhNumber && <div style={{color: 'red', fontSize: 13}}>{errors.billingPhNumber}</div>}
                                 </label>
                               </div>
@@ -604,7 +611,11 @@ const Cart = () => {
                               <div className='row form-group'>
                                 <label>
                                   Phone Number:*
-                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} onChange={handleInputChange} />
+                                  <input type="number" name="billingPhNumber" style={{marginTop: '2px'}} placeholder='Enter your Phone number' maxLength={10} value={billingData.billingPhNumber} 
+                                    onChange={(e) => {handleInputChange(e);
+                                    if(!pattern.test(e.target.value)) setIsError(true); 
+                                    else setIsError(false)}} />
+                                    {isError? <div style={{color: 'red', fontSize: 13}}>Invalid phone number</div>: ''} 
                                   {errors.billingPhNumber && <div style={{color: 'red', fontSize: 13}}>{errors.billingPhNumber}</div>}
                                 </label>
                               </div>
@@ -654,13 +665,14 @@ const Cart = () => {
                                     <div className='col-6'></div>
                               </div>
                               {/* <button type='button' className='address-edit-button w-40 btn' onClick={handleEditToggle}>Edit</button> */}
+                              <button type='button' className='w-60 btn proceed-to-order px-5 py-2'  onClick={handleSubmit}>Place order</button>
                             </div>
                           )
                           }
                         </div >
-                        {!editMode &&
+                        {/* {!editMode &&
                         <button type='button' className='w-60 btn proceed-to-order px-5 py-2'  onClick={handleSubmit}>Place order</button>
-                        }
+                        } */}
                         </div>
                     </div>
                   </div >
