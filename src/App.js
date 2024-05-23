@@ -21,7 +21,6 @@ import AddressForm from './components/Test2';
 import FileUpload from './components/Test4';
 import ShopperInventory from './screens/Shopper/ShopperInventory';
 import Footer from './screens/HeaderFooter/Footer';
-import NavBar from './components/TestHeader';
 import { isShopper, isUserLoggedIn } from './components/AuthService';
 
 
