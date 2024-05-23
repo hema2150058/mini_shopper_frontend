@@ -426,7 +426,7 @@ const Cart = () => {
                 <form>
                   <div className="form-main-container">
                     <div className="form-inside-container">
-                      <div className="cart-details" style={{ width: '37em' }}>
+                      <div className="cart-details" style={{ width: '37em',height: '600px',overflowY: 'scroll'}}>
                         <div className="fs-5">
                           <FontAwesomeIcon size='lg' icon={faCartShopping} />
                           <span style={{ marginLeft: '7px' }}>Order Summary</span>

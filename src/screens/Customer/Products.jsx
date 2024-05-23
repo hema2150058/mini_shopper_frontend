@@ -149,7 +149,7 @@ const Products = () => {
         console.log(response.data);
         localStorage.setItem('orderNumber', response.data);
         console.log(response.data);
-        alert('File uploaded successfully and ' + response.data);
+        alert('File uploaded successfully and order number is: ' + response.data);
         event = '';
 
         navigate('/checkout');
